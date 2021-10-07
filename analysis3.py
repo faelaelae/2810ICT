@@ -22,19 +22,28 @@ cursor.execute(sql_command)
 result = cursor.fetchall()
 
 # Raw input (will be replaced with the input box)
-rawStart = input("Input start date: ")
-rawEnd = input("Input end date: ")
+rawStart = input("Input start period: ")
+rawEnd = input("Input end period: ")
 
-# Convert to datetime for comparing
-start = datetime.strptime(rawStart, '%d/%m/%Y')
-end = datetime.strptime(rawEnd, '%d/%m/%Y')
+# Split in start and end periods
+splitStart = rawStart.split('-')
+splitEnd = rawEnd.split('-')
+
+# Get period 1 (1st year of start period) & period 2 (2nd year of end period)
+period1 = int(splitStart[0])
+period2 = int(splitEnd[1])
+
+print(period1, period2)
 
 # For each record
 for r in result:
 
-    # Convert the record date to datetime
-    date = datetime.strptime(r[2], '%d/%m/%Y')
+    #
+    split_result_period = r[1].split('-')
 
-    # If the record date is between the start and finished
-    if start <= date <= end:
+    result_period1 = int(split_result_period[0])
+    result_period2 = int(split_result_period[1])
+
+    if result_period1 >= period1 and result_period2 <= period2:
         print(r)
+

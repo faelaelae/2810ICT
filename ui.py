@@ -10,6 +10,9 @@ try:
 except ImportError:
     raise ImportError("The datetime module is required to run this program")
 
+import pandas as pd
+from mainFile import *
+
 
 # Create the entire frame and it's contents
 class MainGUI(wx.Frame):
@@ -108,27 +111,20 @@ class MainGUI(wx.Frame):
 
         # Analysis 1 Output Page within this function
         def analysis1Output(event):
-
             # Get the values start and end date strings from input
-            raw_start_date = self.start_date_input.GetValue()
-            raw_end_date = self.end_date_input.GetValue()
-
-            # Convert to datetime for the purpose of finding difference
-            start_date = datetime.strptime(raw_start_date, '%d/%m/%Y')
-            end_date = datetime.strptime(raw_end_date, '%d/%m/%Y')
-
-            print(start_date, end_date)
+            start_period = self.start_date_input.GetValue()
+            end_period = self.end_date_input.GetValue()
 
             # Remove previous elements
             self.removeElements()
 
             # Content for Analysis 1 Output Page
             self.results_heading = wx.StaticText(self.panel2, -1, label="Results",
-                                                          style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
-                                                          size=(750, 40))
+                                                 style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
+                                                 size=(750, 40))
 
             self.record_dates = wx.StaticText(self.panel2, -1, label="Showing all records between " +
-                                                                     raw_start_date + " to " + raw_end_date,
+                                                                     start_period + " to " + end_period,
                                               style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(100, 120),
                                               size=(500, 50))
 
@@ -147,20 +143,23 @@ class MainGUI(wx.Frame):
                                               size=(750, 40))
 
         self.valid_date_text = wx.StaticText(self.panel2, -1,
-                                             label="Please enter a valid start and end date (dd/mm/yyyy)",
+                                             label="Please select a start and end period",
                                              style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(110, 120),
                                              size=(500, 50))
 
-        self.start_date_text = wx.StaticText(self.panel2, -1, label="Start Date",
-                                                      style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
-                                                      size=(70, 20))
+        self.start_date_text = wx.StaticText(self.panel2, 2, label="Start Date",
+                                             style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
+                                             size=(70, 20))
 
-        self.end_date_text = wx.StaticText(self.panel2, -1, label="End Date",
-                                                    style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
-                                                    size=(70, 20))
+        self.end_date_text = wx.StaticText(self.panel2, 2, label="End Date",
+                                           style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
+                                           size=(70, 20))
 
-        self.start_date_input = wx.TextCtrl(self.panel2, pos=(240, 175))
-        self.end_date_input = wx.TextCtrl(self.panel2, pos=(390, 175))
+        selections = ['2011-2012', '2012-2013', '2013-2014', '2014-2015',
+                      '2015-2016', '2016-2017', '2017-2018']
+
+        self.start_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(240, 175))
+        self.end_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(390, 175))
 
         self.analyse_button = wx.Button(self.panel2, pos=(280, 210), label="Analyse", size=(180, 30))
         self.Bind(wx.EVT_BUTTON, analysis1Output, self.analyse_button)
@@ -177,25 +176,19 @@ class MainGUI(wx.Frame):
         # Analysis 2 Output Page within this function
         def analysis2Output(event):
             # Get the values start and end date strings from input
-            raw_start_date = self.start_date_input.GetValue()
-            raw_end_date = self.end_date_input.GetValue()
-
-            # Convert to datetime for the purpose of finding difference
-            start_date = datetime.strptime(raw_start_date, '%d/%m/%Y')
-            end_date = datetime.strptime(raw_end_date, '%d/%m/%Y')
-
-            print(start_date, end_date)
+            start_period = self.start_date_input.GetValue()
+            end_period = self.end_date_input.GetValue()
 
             # Remove previous elements
             self.removeElements()
 
             # Content for Analysis 2 Output Page
             self.results_heading = wx.StaticText(self.panel2, -1, label="Results",
-                                                          style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
-                                                          size=(750, 40))
+                                                 style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
+                                                 size=(750, 40))
 
             self.record_dates = wx.StaticText(self.panel2, -1, label="Showing distribution of cases between " +
-                                                                     raw_start_date + " to " + raw_end_date,
+                                                                     start_period + " to " + end_period,
                                               style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(100, 120),
                                               size=(500, 50))
 
@@ -214,20 +207,23 @@ class MainGUI(wx.Frame):
                                               size=(750, 40))
 
         self.valid_date_text = wx.StaticText(self.panel2, -1,
-                                             label="Please enter a valid start and end date (dd/mm/yyyy)",
+                                             label="Please select a start and end period",
                                              style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(110, 120),
                                              size=(500, 50))
 
         self.start_date_text = wx.StaticText(self.panel2, -1, label="Start Date",
-                                                      style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
-                                                      size=(70, 20))
+                                             style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
+                                             size=(70, 20))
 
         self.end_date_text = wx.StaticText(self.panel2, -1, label="End Date",
-                                                    style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
-                                                    size=(70, 20))
+                                           style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
+                                           size=(70, 20))
 
-        self.start_date_input = wx.TextCtrl(self.panel2, pos=(240, 175))
-        self.end_date_input = wx.TextCtrl(self.panel2, pos=(390, 175))
+        selections = ['2011-2012', '2012-2013', '2013-2014', '2014-2015',
+                      '2015-2016', '2016-2017', '2017-2018']
+
+        self.start_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(240, 175))
+        self.end_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(390, 175))
 
         self.analyse_button = wx.Button(self.panel2, pos=(280, 210), label="Analyse", size=(180, 30))
         self.Bind(wx.EVT_BUTTON, analysis2Output, self.analyse_button)
@@ -244,25 +240,19 @@ class MainGUI(wx.Frame):
         # Analysis 3 Output Page Within this function
         def analysis3Output(event):
             # Get the values start and end date strings from input
-            raw_start_date = self.start_date_input.GetValue()
-            raw_end_date = self.end_date_input.GetValue()
-
-            # Convert to datetime for the purpose of finding difference
-            start_date = datetime.strptime(raw_start_date, '%d/%m/%Y')
-            end_date = datetime.strptime(raw_end_date, '%d/%m/%Y')
-
-            print(start_date, end_date)
+            start_period = self.start_date_input.GetValue()
+            end_period = self.end_date_input.GetValue()
 
             # Remove previous elements
             self.removeElements()
 
             # Content for Analysis 3 Output Page
             self.results_heading = wx.StaticText(self.panel2, -1, label="Results",
-                                                          style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
-                                                          size=(750, 40))
+                                                 style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
+                                                 size=(750, 40))
 
             self.record_dates = wx.StaticText(self.panel2, -1, label="Showing all cases between " +
-                                                                     raw_start_date + " to " + raw_end_date,
+                                                                     start_period + " to " + end_period,
                                               style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(100, 120),
                                               size=(500, 50))
 
@@ -281,20 +271,23 @@ class MainGUI(wx.Frame):
                                               size=(750, 40))
 
         self.valid_date_text = wx.StaticText(self.panel2, -1,
-                                             label="Please enter a valid start and end date (dd/mm/yyyy)",
+                                             label="Please select a start and end period",
                                              style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(110, 120),
                                              size=(500, 50))
 
         self.start_date_text = wx.StaticText(self.panel2, -1, label="Start Date",
-                                                      style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
-                                                      size=(70, 20))
+                                             style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
+                                             size=(70, 20))
 
         self.end_date_text = wx.StaticText(self.panel2, -1, label="End Date",
-                                                    style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
-                                                    size=(70, 20))
+                                           style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
+                                           size=(70, 20))
 
-        self.start_date_input = wx.TextCtrl(self.panel2, pos=(240, 175))
-        self.end_date_input = wx.TextCtrl(self.panel2, pos=(390, 175))
+        selections = ['2011-2012', '2012-2013', '2013-2014', '2014-2015',
+                      '2015-2016', '2016-2017', '2017-2018']
+
+        self.start_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(240, 175))
+        self.end_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(390, 175))
 
         self.analyse_button = wx.Button(self.panel2, pos=(280, 210), label="Analyse", size=(180, 30))
         self.Bind(wx.EVT_BUTTON, analysis3Output, self.analyse_button)
@@ -321,6 +314,9 @@ class MainGUI(wx.Frame):
         analysis_heading_font.PointSize += 5
         analysis_heading_font = analysis_heading_font.Bold()
         self.analysis_heading.SetFont(analysis_heading_font)
+
+        df = analysis()
+        plot = df.plot.bar(x='OFFENCE_FINYEAR', y='COUNT')
 
     # Analysis 5 Page within this function
     def analysis5(self, event):
