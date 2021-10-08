@@ -246,13 +246,13 @@ class MainGUI(wx.Frame):
                                                  style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
                                                  size=(750, 40))
 
-            analysis2(code)
-
             # Analysis 2 Output FONTS
             results_heading_font = self.results_heading.GetFont()
             results_heading_font.PointSize += 5
             results_heading_font = results_heading_font.Bold()
             self.results_heading.SetFont(results_heading_font)
+
+            analysis2(code)
 
         # Remove previous elements
         self.removeElements()
@@ -263,25 +263,11 @@ class MainGUI(wx.Frame):
                                               size=(750, 40))
 
         self.valid_date_text = wx.StaticText(self.panel2, -1,
-                                             label="Please select a start and end period",
+                                             label="Please Enter a valid offense code (eg. 74705)",
                                              style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(110, 120),
                                              size=(500, 50))
 
-        # self.start_date_text = wx.StaticText(self.panel2, -1, label="Start Date",
-        #                                      style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(260, 150),
-        #                                      size=(70, 20))
-
-        # self.end_date_text = wx.StaticText(self.panel2, -1, label="End Date",
-        #                                    style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(410, 150),
-        #                                    size=(70, 20))
-
-        # selections = ['2011-2012', '2012-2013', '2013-2014', '2014-2015',
-        #               '2015-2016', '2016-2017', '2017-2018']
-
-        self.offense_code_input = wx.TextCtrl(self.panel2, pos=(240, 175))
-
-        # self.start_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(240, 175))
-        # self.end_date_input = wx.ComboBox(self.panel2, choices=selections, pos=(390, 175))
+        self.offense_code_input = wx.TextCtrl(self.panel2, pos=(280, 175), size=(180, 25))
 
         self.analyse_button = wx.Button(self.panel2, pos=(280, 210), label="Analyse", size=(180, 30))
         self.Bind(wx.EVT_BUTTON, analysis2output, self.analyse_button)
@@ -303,7 +289,6 @@ class MainGUI(wx.Frame):
 
             data, col_names = analysis3(start_period, end_period)
 
-            # print(data)
             A3Window(data, col_names)
 
             # Remove previous elements
@@ -386,6 +371,11 @@ class MainGUI(wx.Frame):
         self.analysis_heading = wx.StaticText(self.panel2, -1, label="Mobile Phone Analysis",
                                               style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(0, 70),
                                               size=(750, 40))
+
+        self.valid_date_text = wx.StaticText(self.panel2, -1,
+                                             label="Please select an option from the button below",
+                                             style=wx.ALIGN_CENTRE_HORIZONTAL, pos=(110, 120),
+                                             size=(500, 50))
 
         selections = ['Trends', 'Codes', 'School Zones', 'Legislation']
 

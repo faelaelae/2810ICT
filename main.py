@@ -117,7 +117,6 @@ def analysis3(start_period, end_period):
     for desc in c.description:
         col_names.append(desc[0])
 
-    
     # Split in start and end periods
     splitStart = start_period.split('-')
     splitEnd = end_period.split('-')
@@ -166,6 +165,7 @@ def analysis5():
     count = c.fetchall()
     print(count)
     plt.plot(count, years)
+    plt.show()
 
 
 def connectToDB(dbPath):
