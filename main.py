@@ -149,7 +149,7 @@ def analysis4(option):
         a4Trend()
     if option == "Codes":
         a4Codes()
-    if option == "School Zones ":
+    if option == "School Zones":
         a4School()
     if option == "Legislation":
         a4Legislation()
