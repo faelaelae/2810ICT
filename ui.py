@@ -11,10 +11,8 @@ except ImportError:
     raise ImportError("The datetime module is required to run this program")
 
 import wx.grid
-import pandas as pd
-from wx.core import Size
-# from mainFile import *
 from main import *
+import os
 
 class A1Window(wx.Frame):
 
@@ -70,6 +68,12 @@ class A3Window(wx.Frame):
 # Create the entire frame and it's contents
 class MainGUI(wx.Frame):
     def __init__(self, parent, id, title):
+
+        if os.path.isfile('newdb.db'):
+            print('File exists')
+        else:
+            createDB()
+
         wx.Frame.__init__(self, parent, id, title, size=(1000, 600))
         self.Center()
         self.parent = parent

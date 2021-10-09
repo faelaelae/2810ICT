@@ -10,8 +10,8 @@ import openpyxl
 dbPath = "newdb.db"
 
 
-def createDB(csvPath):
-    df = pd.read_csv(csvPath)
+def createDB():
+    df = pd.read_csv('penalty_data_set_2.csv')
     con = sqlite3.connect("newdb.db")
     df.to_sql("fines", con)
     con.close()
@@ -153,7 +153,7 @@ def analysis4(option):
     if option == "Legislation":
         a4Legislation()
 
-   
+
 def analysis5():
     c = connectToDB(dbPath)
     #fetching distinct financial YEARS from db
