@@ -4,15 +4,10 @@ try:
 except ImportError:
     raise ImportError("The wxPython module is required to run this program")
 
-# Make sure datetime is imported
-try:
-    from datetime import datetime
-except ImportError:
-    raise ImportError("The datetime module is required to run this program")
-
 import wx.grid
 from main import *
 import os
+
 
 class A1Window(wx.Frame):
 
@@ -38,6 +33,7 @@ class A1Window(wx.Frame):
         grid.AutoSize()
 
         self.Show()
+
 
 class A3Window(wx.Frame):
 
@@ -69,6 +65,7 @@ class A3Window(wx.Frame):
 class MainGUI(wx.Frame):
     def __init__(self, parent, id, title):
 
+        # Check to see if database exists
         if os.path.isfile('newdb.db'):
             print('File exists')
         else:
