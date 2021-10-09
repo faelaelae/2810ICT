@@ -17,35 +17,63 @@ def createDB(csvPath):
     con.close()
     global dbPath 
     dbPath = "newdb.db"
-    connectToDB(dbPath)
+    connectToDB()
 
 def connectToDB():
-    print(dbPath)
     conn = sqlite3.connect(dbPath)
     c = conn.cursor()
     return c    
     
 
-def analysis1():
+def analysis1(start_period, end_period):
     # Establish a connection to the database
-    c = connectToDB(dbPath)
-    
+    c = connectToDB()
+
     # Write up SQL command
     sql_command = """
-        SELECT *
-        FROM fines
-        WHERE OFFENCE_DESC LIKE '%camera%' OR OFFENCE_DESC LIKE '%radar%';
-    """
-    
+            SELECT *
+            FROM fines;
+        """
+
     # Execute the SQL command
     c.execute(sql_command)
-    
+
     # Fetch the results of the query and store in variable
     result = c.fetchall()
+
+    col_names = []
+    for desc in c.description:
+        col_names.append(desc[0])
+
+    # Split in start and end periods
+    splitStart = start_period.split('-')
+    splitEnd = end_period.split('-')
+
+    # Get period 1 (1st year of start period) & period 2 (2nd year of end period)
+    period1 = int(splitStart[0])
+    period2 = int(splitEnd[1])
+
+    print(period1, period2)
+
+    data = []
+
+    # For each record
+    for r in result:
+
+        split_result_period = r[1].split('-')
+
+        result_period1 = int(split_result_period[0])
+        result_period2 = int(split_result_period[1])
+
+        if result_period1 >= period1 and result_period2 <= period2:
+            data.append(r)
+
+    return data, col_names
+
 def analysis2(code):
-    c = connectToDB(dbPath)
+    c = connectToDB()
     sqlString = "SELECT OFFENCE_FINYEAR, count(*) as counter from fines WHERE OFFENCE_CODE = {code:.0f} GROUP by OFFENCE_FINYEAR"
-    formattedSqlString = sqlString.format(code = code)
+    formattedSqlString = sqlString.format(code = int(code))
     c.execute(formattedSqlString)
     x = c.fetchall()
     datalength = len(x)
@@ -71,61 +99,62 @@ def analysis2(code):
             
     plt.show()
 
-        
-def analysis3(startDate, endDate):
-    i = 0
 
+def analysis3(start_period, end_period):
     # Establish a connection to the database
     c = connectToDB()
-    
+
     # Write up SQL command
     sql_command = """
         SELECT *
         FROM fines
         WHERE OFFENCE_DESC LIKE '%camera%' OR OFFENCE_DESC LIKE '%radar%';
     """
-    
+
     # Execute the SQL command
     c.execute(sql_command)
-    
+
     # Fetch the results of the query and store in variable
     result = c.fetchall()
-    
-    # Raw input (will be replaced with the input box)
-    rawStart = input("Input start period: ")
-    rawEnd = input("Input end period: ")
-    
+
+    col_names = []
+    for desc in c.description:
+        col_names.append(desc[0])
+
     # Split in start and end periods
-    splitStart = rawStart.split('-')
-    splitEnd = rawEnd.split('-')
-    
+    splitStart = start_period.split('-')
+    splitEnd = end_period.split('-')
+
     # Get period 1 (1st year of start period) & period 2 (2nd year of end period)
     period1 = int(splitStart[0])
     period2 = int(splitEnd[1])
-    
+
     print(period1, period2)
-    
+
+    data = []
+
     # For each record
     for r in result:
-    
-        #
+
         split_result_period = r[1].split('-')
-    
+
         result_period1 = int(split_result_period[0])
         result_period2 = int(split_result_period[1])
-    
+
         if result_period1 >= period1 and result_period2 <= period2:
-            print(r)
-    
+            data.append(r)
+
+    return data, col_names
 
 def analysis4(option):
-    if option == "trend":    
+
+    if option == "Trends":
         a4Trend()
-    if option == "codes":
+    if option == "Codes":
         a4Codes()
-    if option == "schoolzonedata":
+    if option == "School Zones":
         a4School()
-    if option == "legislation":
+    if option == "Legislation":
         a4Legislation()
         
             
@@ -149,8 +178,7 @@ def analysis5():
     print(count)
     print(y3)
     plt.plot(y3, count, color='maroon', linewidth=2)
-
-analysis5()
+    plt.show()
 
 
 
