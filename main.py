@@ -68,7 +68,7 @@ def analysis1(start_period, end_period):
 def analysis2(code):
     c = connectToDB(dbPath)
     sqlString = "SELECT OFFENCE_FINYEAR, count(*) as counter from fines WHERE OFFENCE_CODE = {code:.0f} GROUP by OFFENCE_FINYEAR"
-    formattedSqlString = sqlString.format(code = code)
+    formattedSqlString = sqlString.format(code = int(code))
     c.execute(formattedSqlString)
     x = c.fetchall()
     datalength = len(x)
