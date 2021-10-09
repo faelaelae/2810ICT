@@ -10,8 +10,8 @@ import openpyxl
 dbPath = "newdb.db"
 
 
-def createDB():
-    df = pd.read_csv('penalty_data_set_2.csv')
+def createDB(csvPath):
+    df = pd.read_csv(csvPath)
     con = sqlite3.connect("newdb.db")
     df.to_sql("fines", con)
     con.close()
@@ -19,56 +19,33 @@ def createDB():
     dbPath = "newdb.db"
     connectToDB(dbPath)
 
+def connectToDB():
+    print(dbPath)
+    conn = sqlite3.connect(dbPath)
+    c = conn.cursor()
+    return c    
+    
 
-def analysis1(start_period, end_period):
+def analysis1():
     # Establish a connection to the database
     c = connectToDB(dbPath)
-
+    
     # Write up SQL command
     sql_command = """
-            SELECT *
-            FROM fines;
-        """
-
+        SELECT *
+        FROM fines
+        WHERE OFFENCE_DESC LIKE '%camera%' OR OFFENCE_DESC LIKE '%radar%';
+    """
+    
     # Execute the SQL command
     c.execute(sql_command)
-
+    
     # Fetch the results of the query and store in variable
     result = c.fetchall()
-
-    col_names = []
-    for desc in c.description:
-        col_names.append(desc[0])
-
-    # Split in start and end periods
-    splitStart = start_period.split('-')
-    splitEnd = end_period.split('-')
-
-    # Get period 1 (1st year of start period) & period 2 (2nd year of end period)
-    period1 = int(splitStart[0])
-    period2 = int(splitEnd[1])
-
-    print(period1, period2)
-
-    data = []
-
-    # For each record
-    for r in result:
-
-        split_result_period = r[1].split('-')
-
-        result_period1 = int(split_result_period[0])
-        result_period2 = int(split_result_period[1])
-
-        if result_period1 >= period1 and result_period2 <= period2:
-            data.append(r)
-
-    return data, col_names
-
 def analysis2(code):
     c = connectToDB(dbPath)
     sqlString = "SELECT OFFENCE_FINYEAR, count(*) as counter from fines WHERE OFFENCE_CODE = {code:.0f} GROUP by OFFENCE_FINYEAR"
-    formattedSqlString = sqlString.format(code = int(code))
+    formattedSqlString = sqlString.format(code = code)
     c.execute(formattedSqlString)
     x = c.fetchall()
     datalength = len(x)
@@ -95,10 +72,11 @@ def analysis2(code):
     plt.show()
 
         
-def analysis3(start_period, end_period):
+def analysis3(startDate, endDate):
+    i = 0
 
     # Establish a connection to the database
-    c = connectToDB(dbPath)
+    c = connectToDB()
     
     # Write up SQL command
     sql_command = """
@@ -112,70 +90,73 @@ def analysis3(start_period, end_period):
     
     # Fetch the results of the query and store in variable
     result = c.fetchall()
-
-    col_names = []
-    for desc in c.description:
-        col_names.append(desc[0])
-
+    
+    # Raw input (will be replaced with the input box)
+    rawStart = input("Input start period: ")
+    rawEnd = input("Input end period: ")
+    
     # Split in start and end periods
-    splitStart = start_period.split('-')
-    splitEnd = end_period.split('-')
+    splitStart = rawStart.split('-')
+    splitEnd = rawEnd.split('-')
     
     # Get period 1 (1st year of start period) & period 2 (2nd year of end period)
     period1 = int(splitStart[0])
     period2 = int(splitEnd[1])
     
     print(period1, period2)
-
-    data = []
     
     # For each record
     for r in result:
-
+    
+        #
         split_result_period = r[1].split('-')
     
         result_period1 = int(split_result_period[0])
         result_period2 = int(split_result_period[1])
     
         if result_period1 >= period1 and result_period2 <= period2:
-            data.append(r)
-
-    return data, col_names
+            print(r)
+    
 
 def analysis4(option):
-
-    if option == "Trends":
+    if option == "trend":    
         a4Trend()
-    if option == "Codes":
+    if option == "codes":
         a4Codes()
-    if option == "School Zones":
+    if option == "schoolzonedata":
         a4School()
-    if option == "Legislation":
+    if option == "legislation":
         a4Legislation()
-
-
+        
+            
+   
 def analysis5():
-    c = connectToDB(dbPath)
+    dbPath = "newdb.db"
+    c = connectToDB()
     #fetching distinct financial YEARS from db
     c.execute("SELECT DISTINCT(OFFENCE_FINYEAR) FROM fines")
     years = c.fetchall()
+    y2 = np.array(years)
+    y3 = list(set(y2.flat))
+    y4 = y3.sort()
     print(years)
     #fetching count of rows with same OFFENCE_FINYEAR
     c.execute("SELECT count(*) as COUNT FROM fines GROUP BY OFFENCE_FINYEAR")
     count = c.fetchall()
+    plt.xlabel("Financial Years")
+    plt.ylabel("Count")
+    plt.title("Number of fines per financial year")
     print(count)
-    plt.plot(count, years)
-    plt.show()
+    print(y3)
+    plt.plot(y3, count, color='maroon', linewidth=2)
+
+analysis5()
 
 
-def connectToDB(dbPath):
-    print(dbPath)
-    conn = sqlite3.connect(dbPath)
-    c = conn.cursor()
-    return c
+
 
 def a4Trend():
-    c = connectToDB(dbPath)
+    c = connectToDB()
     # SQL executions and converting to numpy arrays
     c.execute("SELECT DISTINCT(OFFENCE_FINYEAR) FROM fines")
     years2 = c.fetchall()
@@ -188,11 +169,15 @@ def a4Trend():
     # sorting y4 so it matches the data from the database
     y5 = y4.sort()
     # plotting and showing graph
-    plt.plot(y4, td2)
+    fig = plt.figure(figsize = (10, 5))
+    plt.xlabel("Financial Years")
+    plt.ylabel("Count")
+    plt.title("Count of Mobile Phone related offences per financial year")
+    plt.plot(y4, td2, color='maroon', linewidth=2)
     plt.show()
             
 def a4Codes():
-    c = connectToDB(dbPath)
+    c = connectToDB()
     c.execute("SELECT OFFENCE_CODE, count(*) as Counter from fines WHERE MOBILE_PHONE_IND ='Y' GROUP by OFFENCE_CODE ORDER by OFFENCE_CODE")
     x = c.fetchall()        
     data = dict(x)
@@ -211,7 +196,7 @@ def a4Codes():
     plt.show()
     
 def a4School():
-    c = connectToDB(dbPath)
+    c = connectToDB()
     c.execute("SELECT OFFENCE_CODE, count(*) as Counter from fines WHERE MOBILE_PHONE_IND ='Y' AND SCHOOL_ZONE_IND ='Y' GROUP by OFFENCE_CODE ORDER by OFFENCE_CODE")
     x = c.fetchall()
     data = dict(x)
@@ -231,7 +216,7 @@ def a4School():
     plt.show()
             
 def a4Legislation():
-    c = connectToDB(dbPath)
+    c = connectToDB()
     c.execute("SELECT LEGISLATION, count(*) as legislationCount from fines WHERE MOBILE_PHONE_IND = 'Y' GROUP by LEGISLATION")
     x = c.fetchall()
     data = dict(x)
