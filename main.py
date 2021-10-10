@@ -1,30 +1,27 @@
 import sqlite3
 import pandas as pd
-import datetime
 import matplotlib.pyplot as plt
 import numpy as np
-from dateutil import parser
-from collections import Counter
-import openpyxl
+
 # import ui
 dbPath = "newdb.db"
 
-
-def createDB(csvPath):
-    df = pd.read_csv(csvPath)
+#using pandas to create a sqlite3 db using pandas read_csv and to_sql methods
+def createDB():
+    df = pd.read_csv("penalty_data_set_2.csv")
     con = sqlite3.connect("newdb.db")
     df.to_sql("fines", con)
     con.close()
     global dbPath 
     dbPath = "newdb.db"
-    connectToDB()
 
+#function to connect to the DB
 def connectToDB():
     conn = sqlite3.connect(dbPath)
     c = conn.cursor()
     return c    
     
-
+#function for the first analysis
 def analysis1(start_period, end_period):
     # Establish a connection to the database
     c = connectToDB()
@@ -69,10 +66,12 @@ def analysis1(start_period, end_period):
             data.append(r)
 
     return data, col_names
-
+#function for the second analysis
 def analysis2(code):
+    #connect to the DB
     c = connectToDB()
     sqlString = "SELECT OFFENCE_FINYEAR, count(*) as counter from fines WHERE OFFENCE_CODE = {code:.0f} GROUP by OFFENCE_FINYEAR"
+    # formatting the string so it can be used in execution
     formattedSqlString = sqlString.format(code = int(code))
     c.execute(formattedSqlString)
     x = c.fetchall()
@@ -83,20 +82,20 @@ def analysis2(code):
         print("Not valid code")
         errorMsg = "Did not find any codes with that value"
         return errorMsg
+    #manipulating the data so it is moved into formats usable by matplotlib
     data = dict(x)
     keys = list(data.keys())
     values = list(data.values())
-    
     fixedkeys = list(map(str, keys))
     
-    
+    #making the plt graph with visual modifications
     fig = plt.figure(figsize = (10, 5))
     plt.bar(fixedkeys, values, color='maroon', width=0.4)
-            
+    #labelling graph        
     plt.xlabel("Financial Years")
     plt.ylabel("Occurences")
     plt.title("Amount of times each code occurs")
-            
+    #showing graph
     plt.show()
 
 
@@ -145,9 +144,9 @@ def analysis3(start_period, end_period):
             data.append(r)
 
     return data, col_names
-
+#function for fourth analysis
 def analysis4(option):
-
+    #control function which runs a second function based on the value from the UI dropdown box
     if option == "Trends":
         a4Trend()
     if option == "Codes":
@@ -262,7 +261,3 @@ def a4Legislation():
     plt.title("Which legislation was used to fine")
     
     plt.show()
-
-
-
-
